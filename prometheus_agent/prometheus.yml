@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+scrape_configs:
+  - job_name: 'prtg'
+    static_configs:
+      - targets: ['localhost:9705']   # prtg_exporter endpoint
+    relabel_configs:
+      - target_label: cluster
+        replacement: prtg-external
+      - target_label: env
+        replacement: prod
+
+remote_write:
+  - url: "https://your-groundcover-instance.com/api/v1/write"
+    # 🔐 Use Groundcover API key via HTTP header
+    headers:
+      apikey: "your-groundcover-api-key"
+
+    # Optional tuning for reliability
+    queue_config:
+      capacity: 20000
+      max_shards: 10
+      min_shards: 1
+      max_samples_per_send: 5000
+      batch_send_deadline: 5s

@@ -1,0 +1,23 @@
+# Sensitive configuration files
+infrastructure/terraform/*.tfvars
+infrastructure/terraform/*.tfstate
+infrastructure/terraform/*.tfstate.backup
+infrastructure/terraform/.terraform/
+
+# Prometheus configuration with API keys
+# Note: prometheus.yml should use placeholder values if committed
+# Consider adding to gitignore if it contains real credentials
+
+# OS and IDE files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+**/bin/
+**/obj/
+**/.vs/
+
