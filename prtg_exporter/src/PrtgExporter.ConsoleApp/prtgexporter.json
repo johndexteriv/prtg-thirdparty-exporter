@@ -1,0 +1,12 @@
+{
+	"PRTG": {
+		"Server": "https://your-prtg-server.com",
+		"Username": "your-username",
+		"Password": "your-passhash"
+	},
+
+	"Exporter": {
+		"Port": "9705",
+		"RefreshInterval": 120
+	}
+}
