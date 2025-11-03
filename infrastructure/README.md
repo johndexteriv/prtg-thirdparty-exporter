@@ -98,8 +98,30 @@ exporter_port      = 9705
   - .NET 8.0 runtime
   - PRTG exporter service (port 9705)
   - Prometheus agent (deployed separately, scrapes from localhost:9705)
-- **Security Group:** Allows HTTP metrics endpoint and SSH access
+- **Security Group:** 
+  - **Inbound:** SSH (22) from allowed CIDR, metrics endpoint (9705) 
+  - **Outbound:** HTTPS (443) to PRTG API, HTTP (80) to PRTG API, all outbound for package installation
 - **Integration:** Works with Prometheus agent on same host for metrics forwarding
+
+#### Network Connectivity Requirements
+
+The PRTG exporter instance requires the following network connectivity:
+
+**Outbound Connections:**
+- **PRTG API** - HTTPS (443) or HTTP (80) to reach the PRTG server API
+  - The exporter makes periodic API calls to fetch sensor and channel data
+  - Configured via `prtg_server` in `terraform.tfvars`
+- **Groundcover Platform** - HTTPS (443) for remote write endpoint
+  - Prometheus agent sends metrics to Groundcover's remote write API
+  - Configured in `prometheus_agent/prometheus.yml`
+- **Package Repositories** - HTTPS (443) for installing .NET runtime and packages
+
+**Inbound Connections:**
+- **SSH (22)** - For deployment and management (restricted to `allowed_ssh_cidr`)
+- **Metrics Endpoint (9705)** - Exposed on localhost for Prometheus agent scraping
+  - No external network access needed (Prometheus agent runs on the same host)
+
+The security group automatically configures these rules when deployed via Terraform.
 
 ## 📜 Scripts
 

@@ -228,6 +228,59 @@ ssh -i ~/.ssh/prtg-exporter-key.pem ec2-user@$EXPORTER_IP \
 
 ---
 
+## 🌐 Networking Requirements
+
+The PRTG exporter node requires specific network connectivity to function properly:
+
+### Outbound Connectivity
+
+**PRTG Exporter → PRTG API:**
+- **HTTPS (port 443)** - Required for connecting to PRTG server API
+- **HTTP (port 80)** - Optional fallback if PRTG server uses HTTP
+- The exporter makes periodic API calls to fetch sensor and channel data from PRTG
+
+**Prometheus Agent → Groundcover Platform:**
+- **HTTPS (port 443)** - Required for remote write to Groundcover's API endpoint
+- The Prometheus agent forwards scraped metrics to Groundcover via remote write
+- Configure the endpoint in `prometheus_agent/prometheus.yml` as `https://your-groundcover-instance.com/api/v1/write`
+
+### Inbound Connectivity
+
+**SSH Access (port 22):**
+- Required for deployment and management
+- Configured via `allowed_ssh_cidr` in `terraform.tfvars`
+
+**Metrics Endpoint (port 9705):**
+- Exposed on localhost only (scraped by Prometheus agent on the same host)
+- No external network access required for metrics endpoint
+- Security group allows external access, but Prometheus agent connects locally
+
+### Security Group Configuration
+
+The Terraform configuration automatically sets up:
+- ✅ Outbound HTTPS (443) to PRTG API
+- ✅ Outbound HTTP (80) to PRTG API  
+- ✅ Outbound HTTPS (443) for general connectivity (includes Groundcover)
+- ✅ Inbound SSH (22) from allowed CIDR blocks
+
+### Testing Network Connectivity
+
+If experiencing connectivity issues, test from the instance:
+
+```bash
+# Test PRTG API connectivity
+curl -I https://your-prtg-server.com/api/table.json
+
+# Test Groundcover endpoint connectivity  
+curl -I https://your-groundcover-instance.com/api/v1/write
+
+# Check DNS resolution
+nslookup your-prtg-server.com
+nslookup your-groundcover-instance.com
+```
+
+---
+
 ## 🔧 Configuration
 
 ### Terraform Variables
